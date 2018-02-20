@@ -1,0 +1,14 @@
+{
+  "name": "randgen",
+  "version": "1.0.0",
+  "description": "Random Number Generator",
+  "main": "main.js",
+  "scripts": {
+    "test": "electron  ."
+  },
+  "author": "Tobe, Orlando & Tania",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^1.8.2"
+  }
+}
