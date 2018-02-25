@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf8">
+    <title>Vista de lista</title>
+
+    <!-- Materialize -->
+    <link rel="stylesheet" type="text/css" href="../materialize/css/materialize.min.css">
+    <script src="../materialize/js/materialize.min.js"></script>
+
+    <script src="./components/testPickerModule.js"></script>
+  </head>
+  <body>
+    <!-- Header -->
+    <nav class="teal">
+      <div class="container">
+        <a href="#" class="brand-logo">Generador de números aleatorios</a>
+      </div>
+    </nav>
+    <!-- Main content -->
+    <div class="container">
+      <div class="section">
+        <h5>Lista generada</h5>  
+        <span>Cantidad: <b id="qty"></b></span>
+        <blockquote id="lst"></blockquote>
+      </div>
+      <div class="divider"></div>
+      <div class="section">
+        <canvas id="chart" width="400px" height="100px"></canvas>
+      </div>
+      <div class="divider"></div>
+    </div>      
+    <script type="text/javascript">
+
+      const { Canvas }  = require("chart.js");
+
+      let qty = document.getElementById("qty");
+      let lst = document.getElementById("lst");
+      let chartCtx = document.getElementById("chart").getContext('2d');
+
+      function displayList(list) {
+        // Display quantity
+        qty.innerText = list.length;
+
+        // Display list
+        let strList = "", decimals = 4;
+        for (var i = 0; i < list.length; i++)
+          strList += list[i].toFixed(decimals) + (i < list.length - 1 ? ", " : "");
+
+        lst.innerText = strList;
+
+        // Display chart
+        let x = [], y = [];
+        for(var i = 0; i < list.length; i++)
+          x.push(i + 1), y.push(list[i]);
+
+        let chart = new Chart(chartCtx, {
+          type: 'line',
+            data: {
+              labels: x,
+                datasets: [{
+                    label: 'Valor',
+                    data: y,
+                    backgroundColor: ['rgba(153, 102, 255, 0.2)'],
+                    borderColor: ['rgba(153, 102, 255, 1)'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        });
+      }
+
+      // TODO : HERE THE LIST SHOULD COME FROM MAIN
+      let collection = Array();
+      
+      for (let i = 0; i < 100; i++)
+        collection.push(Math.random());
+      //
+      
+      displayList(collection);
+      initTestPicker(collection);
+      showTestPicker();
+
+    </script>
+  </body>
+</html>
