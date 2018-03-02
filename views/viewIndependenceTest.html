@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf8">
+    <title>Prueba de independencia</title>
+
+    <!-- Materialize -->
+    <link rel="stylesheet" type="text/css" href="../materialize/css/materialize.min.css">
+
+    <!-- MathJax-->
+    <script async src="../mathjax/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  </head>
+  <body>
+    <!-- Header -->
+    <nav class="teal">
+      <div class="container">
+        <a href="#" class="brand-logo">Generador de números aleatorios</a>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <div class="container">
+      <div class="section">
+        <h5>Prueba de independencia</h5>
+        <p>Nivel de confianza:</p>
+        <form name="ncform">
+          <div class="row">
+            <div class="col s2">
+              <input name="grpNC" type="radio" id="opt90" />
+              <label for="opt90">90%</label>
+            </div>
+            <div class="col s2">
+              <input name="grpNC" type="radio" id="opt95" />
+              <label for="opt95">95%</label>
+            </div>
+            <div class="col s2">
+              <input name="grpNC" type="radio" id="opt98" />
+              <label for="opt98">98%</label>
+            </div>
+            <div class="col s2">
+              <input name="grpNC" type="radio" id="opt99" />
+              <label for="opt99">99%</label>
+            </div>
+          </div>  
+        </form>
+        <div class="row">
+          <div class="col s4">
+            <p>$ N $:</p>
+            <blockquote id="bqN"></blockquote>
+          </div>
+          <div class="col s4">
+            <p>$ NC $:</p>
+            <blockquote id="bqNC"></blockquote>
+          </div>
+          <div class="col s4">
+            <p>$ \alpha $:</p>
+            <blockquote id="bqAlpha"></blockquote>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col s6">
+            <canvas id="chartDist" width="400px" height="300px"></canvas>
+          </div>
+          <div class="col s6">
+            <canvas id="chartDist2" width="400px" height="300px"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="section">
+        <h5>Desarrollo</h5>
+        <div class="row">
+          <div class="col s6">
+          <p>Hipótesis $ H_0 $:</p>
+            <blockquote>Los números del conjunto $r_i$ son independientes</blockquote>
+          </div>
+          <div class="col s6">
+            <p>Hipótesis $H_1$:</p>
+            <blockquote>Los números del conjunto no $r_i$ son independientes</blockquote>
+          </div>
+        </div>
+        <p>De las fórmulas siguientes</p>
+        <div class="row">
+          <div class="col s4">
+            <p>$$m \sim \sqrt{N}$$</p>
+          </div>
+          <div class="col s4">
+            <p>$$\chi^2_0 = \sum^m_{i=1}{\frac{(E_i-O_i)^2}{E_i}}$$</p>
+          </div>
+          <div class="col s4">
+            <p>$$\chi^2_0 \lt \chi^2_{\alpha,m-1}$$</p>
+          </div>
+        </div>    
+        <p>Se obtienen</p>
+        <div class="row">
+          <div class="col m4 s12">
+            <p>$m:$</p>  
+            <blockquote id="bqM"></blockquote>
+          </div>
+          <div class="col m4 s12">
+            <p>$\chi^2_0:$</p>
+            <blockquote id="bqX0"></blockquote>
+          </div>
+          <div class="col m4 s12">
+            <p>$\chi^2_{\alpha,m-1}:$</p>
+            <blockquote id="bqXa"></blockquote>
+          </div>
+        </div>      
+      </div>
+      <div class="divider"></div>
+      <div class="section">
+        <h5>Conclusión</h5>
+        <p>Dado que el valor de $\chi^2_0$ <span id="ans1"></span> es menor que $\chi^2_{\alpha,m-1}$, 
+        podemos concluir que la hipótesis es <span id="ans2">válida</span> para un nivel de confianza de <span id="ans3"></span>.</p>
+      </div>
+    </div>  
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          processEscapes: true
+        }
+      });
+    </script>
+
+    <script type="text/javascript">
+      const { ipcRenderer } = require("electron");
+      const { Canvas }  = require("chart.js");
+
+      let bqN = document.getElementById("bqN");
+      let bqNC = document.getElementById("bqNC");
+      let bqAlpha = document.getElementById("bqAlpha");
+
+      let bqM = document.getElementById("bqM");
+      let bqX0 = document.getElementById("bqX0");
+      let bqXa = document.getElementById("bqXa");
+
+      let ans1 = document.getElementById("ans1");
+      let ans2 = document.getElementById("ans2"); 
+      let ans3 = document.getElementById("ans3"); 
+
+      let chartDistCtx = document.getElementById("chartDist").getContext('2d');
+      let chartDist2Ctx = document.getElementById("chartDist2").getContext('2d');
+
+      let collection = [];
+
+      function Z_dist(alpha) {
+        if(alpha <= 0.500)  return -Z_dist(1 - alpha);
+        if(alpha == 0.900)  return 1.28;
+        if(alpha == 0.950)  return 1.65;
+        if(alpha == 0.975)  return 1.96;
+        if(alpha == 0.980)  return 2.05;
+        if(alpha == 0.990)  return 2.33;
+        if(alpha == 0.995)  return 2.58;
+      }
+
+      function CHI_dist(alpha,v) {
+        return 0.5 * Math.pow(Z_dist(alpha) + Math.sqrt(2 * v - 1), 2);
+      }
+
+      function toPoints(list) {
+        let ans = [];
+
+        for (let i = 0; i < list.length - 1; i++)
+          ans.push({ x: list[i], y: list[i + 1]});
+
+        return ans;
+      }
+
+      function evaluate(list, nc) {
+        let alpha = 1.0 - nc;
+
+        // Convert to points
+        let points = toPoints(list);
+
+        // Calculate m
+        let o = Math.ceil(Math.pow(points.length,0.25));
+        let m = o * o;
+
+        let l = [], e = [], v = [];
+        for (let i = 0; i < m; i++)
+          l.push(i + 1), e.push(0), v.push(points.length / m);
+        for (let i = 0; i < points.length; i++) {
+          let e_x = Math.floor(o * points[i].x);
+          let e_y = Math.floor(o * points[i].y);
+          e[e_y * o + e_x]++;
+        }        
+        
+        // Calculate X_0
+        let chi = 0.0;
+
+        for(let i = 0; i < m; i++)
+          chi += Math.pow(e[i] - v[i], 2) / e[i];
+
+        // Calculate X_a
+        let chi2 = CHI_dist(1 - alpha, m - 1);
+
+        // Display chart
+        let chart1 = new Chart(chartDistCtx, {
+          type: 'scatter',
+          data: {
+            datasets: [{
+              label: 'Observado',
+              data: points,
+              borderColor: "#0060ff"
+            }]
+          },
+          options: {
+            scales: {
+              yAxes: [{
+                ticks: {
+                  beginAtZero:true,
+                  min: 0,
+                  max: 1,
+                  stepSize: (1 / o)
+                }
+              }],
+              xAxes: [{
+                ticks: {
+                  beginAtZero: true,
+                  min: 0,
+                  max: 1,
+                  stepSize: (1 / o)
+                }
+              }]
+            }
+          }
+        });  
+
+        let chart2 = new Chart(chartDist2Ctx, {
+          type: 'line',
+          data: {
+            labels: l,
+            datasets: [{
+              label: 'Observado',
+              data: e,
+              borderColor: "#0060ff"
+            }, {
+              label: 'Esperado',
+              data: v,
+              borderColor: "#c0c0c0"
+            }]
+          },
+          options: {
+            scales: {
+              yAxes: [{
+                ticks: {
+                  beginAtZero:true,
+                }
+              }]
+            }
+          }
+        });     
+
+        // Display data
+        bqN.innerText = list.length;
+        bqNC.innerText = nc;
+        bqAlpha.innerText = alpha.toFixed(2);
+
+        bqM.innerText = m;
+        bqX0.innerText = chi.toFixed(4);
+        bqXa.innerText = chi2.toFixed(4);
+
+        let hypo = chi < chi2;
+
+        // Display hypo
+        ans1.innerText = (hypo ? "" : "no");
+        ans2.innerText = (hypo ? "válida" : "inválida");
+        ans3.innerText = Math.floor(nc * 100) + "%";
+      }
+
+      ipcRenderer.on("message", function(e, args) {
+        collection = args;
+        document.querySelector("#opt95").click();
+      });
+
+      document.forms.ncform.onchange = function(e) {
+        let optId = e.target.id, nc = parseInt(optId.substr(3, 2)) / 100.0;
+        evaluate(collection, nc);
+      };
+
+    </script>
+  </body>
+</html>
