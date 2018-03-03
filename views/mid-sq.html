@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="../materialize/css/materialize.min.css">
+  <title>Cuadrados Medios</title>
+</head>
+<body>
+  <form class="container">
+    <div class="input-field">
+      <input type="number" name="seed" id="txtSeed" class="validate">
+      <label class="active" for="seed">Semilla</label>
+    </div>
+    <div class="input-field">
+      <input type="number" name="size" id="txtSize" class="validate">
+      <label class="active" for="size">Cantidad de Numeros</label>
+    </div>
+    <button id="btnOk" class="waves-effect waves-light btn col 4">
+      Ok
+    </button>
+  </form>
+
+  <script>
+
+    // Caculates the the radom numbers using middle square algorithm
+    function midSq(seed, n){
+      let D = (seed + "").length; // This is the size of each X
+      let collection = [];         // Out collection
+      let last = seed;             // We need to save the last calculated X
+      for(let i = 0; i < n; i++){
+        let sq = Math.pow(Number(last), 2); //Power X by 2 and 
+        last = extractFromMiddle(sq, D); // extract D numbers from the middle.
+        let r_i = "0." + last;  // append a 0 to the beggining
+        collection.push(Number(r_i)); // done.
+      }
+      return collection;
+    }
+
+    function extractFromMiddle(num, n){
+      num = String(num);
+      if(num.lenght % 2 != n % 2){ // One is pair the oher odd.
+        num = "0" + num; // Insert a 0 to the left.
+      }
+      let index = (num.length - n) / 2
+      return Number(String(num).substr(index + 1,n)); //Returns the extracted digits as a number.
+    }
+
+    const {ipcRenderer} = require("electron");
+
+    // Calculate
+    document.getElementById("btnOk").onclick = (e) => {
+      e.preventDefault();
+      let seed = document.getElementById("txtSeed").value;
+      let n = document.getElementById("txtSize").value;
+      ipcRenderer.send("ShowView:ViewCollection", midSq(seed, n));
+    };
+  </script>
+
+</body>
+</html>
