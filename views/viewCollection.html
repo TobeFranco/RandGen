@@ -6,8 +6,6 @@
 
     <!-- Materialize -->
     <link rel="stylesheet" type="text/css" href="../materialize/css/materialize.min.css">
-    <script src="../materialize/js/materialize.min.js"></script>
-
     <script src="./components/testPickerModule.js"></script>
   </head>
   <body>
@@ -78,16 +76,13 @@
         });
       }
 
-      // TODO : HERE THE LIST SHOULD COME FROM MAIN
-      let collection = Array();
-      
-      for (let i = 0; i < 100; i++)
-        collection.push(Math.random());
-      //
-      
-      displayList(collection);
-      initTestPicker(collection);
-      showTestPicker();
+      // Retrieve collection from main
+      let {ipcRenderer} = require("electron");
+      ipcRenderer.on("ShowView:ShowRandNums", (e, collection) =>{
+        displayList(collection);
+        initTestPicker(collection);
+        showTestPicker();
+      });
 
     </script>
   </body>
