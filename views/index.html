@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../materialize/css/materialize.min.css">
+    <title>Random Number Generador</title>
+</head>
+<body>
+    <section>
+      <div class="row">
+        <div class="col s12 m6">
+          <div class="card horizontal small">
+            <div class="card-image">
+              <img src="../assets/images/fractal1.jpg">
+              <span class="card-title">Cuadrados Medios</span>
+            </div>
+            <div class="card-stacked">
+              <div class="card-content">
+                <p>Calcula una secuencia de numeros aleatorios utilizando el metodo de Cuadrados Medios.</p>
+              </div>
+              <div class="card-action">
+                <button id="mid-sq" class="waves-effect waves-light btn">
+                  Calcular
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col s12 m6">
+          <div class="card horizontal small">
+            <div class="card-image">
+              <img src="../assets/images/fractal2.jpg">
+              <span class="card-title">Productos Medios</span>
+            </div>
+            <div class="card-stacked">
+              <div class="card-content">
+                  <p>Calcula una secuencia de numeros aleatorios utilizando el metodo de Productos Medios.</p>
+              </div>
+              <div class="card-action">
+                <button id="mid-prod" class="waves-effect waves-light btn">
+                  Calcular
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+            <div class="col s12 m6">
+              <div class="card horizontal small">
+                <div class="card-image">
+                  <img src="../assets/images/fractal3.jpg">
+                  <span class="card-title">Multiplicador Constante</span>
+                </div>
+                <div class="card-stacked">
+                  <div class="card-content">
+                    <p>Calcula una secuencia de numeros aleatorios utilizando el metodo multiplicador constante.</p>
+                  </div>
+                  <div class="card-action">
+                    <button id="const-mult" class="waves-effect waves-light btn">
+                      Calcular
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col s12 m6">
+              <div class="card horizontal small">
+                <div class="card-image">
+                  <img src="../assets/images/fractal4.jpg">
+                  <span class="card-title">Congruencial Lineal</span>
+                </div>
+                <div class="card-stacked">
+                  <div class="card-content">
+                      <p>Calcula una secuencia de numeros aleatorios utilizando el metodo Congruencial Lineal.</p>
+                  </div>
+                  <div class="card-action">
+                    <button id="lin-cong" class="waves-effect waves-light btn">
+                      Calcular
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+      </div>
+      <div class="row">
+            <div class="col s12 m6">
+              <div class="card horizontal small">
+                <div class="card-image">
+                  <img src="../assets/images/fractal5.jpg">
+                  <span class="card-title">Congruencial Multiplicativo</span>
+                </div>
+                <div class="card-stacked">
+                  <div class="card-content">
+                    <p>Calcula una secuencia de numeros aleatorios utilizando el metodo Congruencial Multiplicativo.</p>
+                  </div>
+                  <div class="card-action">
+                    <button id="mult-cong" class="waves-effect waves-light btn">
+                      Calcular
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col s12 m6">
+              <div class="card horizontal small">
+                <div class="card-image">
+                  <img src="../assets/images/fractal6.jpg">
+                  <span class="card-title">Congruencial Aditivo</span>
+                </div>
+                <div class="card-stacked">
+                  <div class="card-content">
+                      <p>Calcula una secuencia de numeros aleatorios utilizando el metodo Congruencial Aditivo.</p>
+                  </div>
+                  <div class="card-action">
+                    <button id="ad-cong" class="waves-effect waves-light btn">
+                      Calcular
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+      </div>
+      <div class="row">
+            <div class="col s12 m6">
+              <div class="card horizontal small">
+                <div class="card-image">
+                  <img src="../assets/images/fractal8.jpg">
+                  <span class="card-title">Congruencial Cuadratico</span>
+                </div>
+                <div class="card-stacked">
+                  <div class="card-content">
+                    <p>Calcula una secuencia de numeros aleatorios utilizando el metodo Congruencial Cuadratico.</p>
+                  </div>
+                  <div class="card-action">
+                    <button id="cuad-cong" class="waves-effect waves-light btn">
+                      Calcular
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col s12 m6">
+              <div class="card horizontal small">
+                <div class="card-image">
+                  <img src="../assets/images/fractal9.jpg">
+                  <span class="card-title">Blum Blum Shub</span>
+                </div>
+                <div class="card-stacked">
+                  <div class="card-content">
+                      <p>Calcula una secuencia de numeros aleatorios utilizando el metodo Blum Blum Shub.</p>
+                  </div>
+                  <div class="card-action">
+                    <button id="bbs" class="waves-effect waves-light btn">
+                      Calcular
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+      </div>
+    </section>
+
+    <script>
+        let {ipcRenderer} = require("electron");
+        document.getElementById("mid-sq").onclick = function(e){
+            e.preventDefault();
+            ipcRenderer.send("ShowView:MiddleSquares");
+        }
+        document.getElementById("mid-prod").onclick = function(e){
+            e.preventDefault();
+            ipcRenderer.send("ShowView:MiddleProducts");
+        }
+        document.getElementById("const-mult").onclick = function(e){
+            e.preventDefault();
+            ipcRenderer.send("ShowView:ConstantMultiplier");
+        }
+        document.getElementById("lin-cong").onclick = function(e){
+            e.preventDefault();
+            ipcRenderer.send("ShowView:LinearCongruential");
+        }
+        document.getElementById("mult-cong").onclick = function(e){
+            e.preventDefault();
+            ipcRenderer.send("ShowView:MultiplicativeCongruential");
+        }
+        document.getElementById("ad-cong").onclick = function(e){
+            e.preventDefault();
+            ipcRenderer.send("ShowView:AditiveCongruential");
+        }
+        document.getElementById("cuad-cong").onclick = function(e){
+            e.preventDefault();
+            ipcRenderer.send("ShowView:CuadraticCongruential");
+        }
+        document.getElementById("bbs").onclick = function(e){
+            e.preventDefault();
+            ipcRenderer.send("ShowView:BlumBlumShub");
+        }
+    </script>
+
+</body>
+</html>
