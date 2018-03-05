@@ -19,8 +19,11 @@
     </button>
   </form>
 
-  <script>
+  <script src="../node_modules/jquery/dist/jquery.js"></script>
+  <script src="../materialize/js/hammer.min.js"></script>
+  <script src="../materialize/js/materialize.js"></script>
 
+  <script>
     // Caculates the the radom numbers using middle square algorithm
     function midSq(seed, n){
       let D = (seed + "").length; // This is the size of each X
@@ -45,14 +48,55 @@
     }
 
     const {ipcRenderer} = require("electron");
+    let seedField = document.getElementById("txtSeed"); // Global reference to the seed field.
+    let nField = document.getElementById("txtSize");  //  Global reference to the sieze field.
+    let okButton = document.getElementById("btnOk"); //  Global reference to the ok button.
 
     // Calculate
-    document.getElementById("btnOk").onclick = (e) => {
-      e.preventDefault();
-      let seed = document.getElementById("txtSeed").value;
+    okButton.onclick = (e) => {
+      e.preventDefault(); // Don't send to a new page.
+      let seed = document.getElementById("txtSeed").value; // get the seed.
       let n = document.getElementById("txtSize").value;
-      ipcRenderer.send("ShowView:ViewCollection", midSq(seed, n));
+      if(validate()){ // If everything is validated....
+        ipcRenderer.send("ShowView:ViewCollection", midSq(seed, n)); // ... show the next window.
+      }
     };
+
+    // Whenever clicked remove the invalid class.
+    seedField.onfocus = () => {
+      seedField.classList.remove("invalid");
+    };
+
+    // Whenever clicked remove the invalid class.
+    nField.onfocus = () => {
+      nField.classList.remove("invalid");
+    };
+
+    function validate(){
+      if(seedField.value == ""){ // Empty Input
+        Materialize.toast("Campo Vacio", 4000);
+        seedField.classList.add("invalid"); // Adds the invalid class to the corresponding field.
+        return false;
+      }else if(nField.value == ""){ // Empty Input
+        Materialize.toast("Campo Vacio", 4000);
+        nField.classList.add("invalid");
+        return false;
+      }else if((seedField.value + "").length < 3){ // Seed Size
+        Materialize.toast("Se requiere una semilla de minimo 3 digitos", 4000);
+        seedField.classList.add("invalid");
+        return false;
+      }else if(nField.value < 1){// Require a positive grater than 1 quantity of generated numbers.
+        Materialize.toast("La cantidad de numeros a generar debe ser minimo 1.", 4000);
+        nField.classList.add("invalid");
+        return false;
+      }else if(seedField.value <= 0){ // Seed value
+        Materialize.toast("Se requiere una semilla con valor positivo diferente de 0", 4000);
+        seedField.classList.add("invalid");
+        return false;
+      }
+      return true; // Everything is fine.
+    }
+
   </script>
 
 </body>
