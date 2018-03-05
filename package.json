@@ -1,15 +1,23 @@
 {
   "name": "randgen",
+  "productName": "randGen",
   "version": "1.0.0",
   "description": "Random Number Generator",
   "main": "main.js",
   "scripts": {
-    "test": "electron  ."
+    "test": "electron  .",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --prune=true --out=release-builds-Mac",
+    "package-win": "electron-packager . randGen --overwrite --asar=true --platform=win32 --arch=ia32 --prune=true --out=release-builds-win --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"randGen\"",
+    "package-linux": "electron-packager . randGen --overwrite --asar=true --platform=linux --arch=x64 --prune=true --out=release-builds-linux"
   },
   "author": "Tobe, Orlando & Tania",
   "license": "MIT",
   "dependencies": {
     "chart.js": "^2.7.1",
-    "electron": "^1.8.2"
+    "electron": "^1.8.2",
+    "jquery": "^3.3.1"
+  },
+  "devDependencies": {
+    "electron-packager": "^11.0.1"
   }
 }
