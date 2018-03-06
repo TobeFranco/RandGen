@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="../materialize/css/materialize.min.css">
+  <title>Cuadrados Medios</title>
+</head>
+<body>
+  <form class="container">
+    <div class="input-field">
+      <input type="number" name="seed" id="txtSeed" class="validate">
+      <label class="active" for="seed">Semilla</label>
+    </div>
+    <div class="input-field">
+      <input type="number" name="g_value" id="txt_g" class="validate">
+      <label class="active" for="g_value">Valor de g</label>
+    </div>
+    <div class="input-field">
+      <input type="number" name="size" id="txtSize" class="validate">
+      <label class="active" for="size">Cantidad de Numeros</label>
+    </div>
+    <button id="btnOk" class="waves-effect waves-light btn col 4">
+      Ok
+    </button>
+  </form>
+
+  <script src="../node_modules/jquery/dist/jquery.js"></script>
+  <script src="../materialize/js/hammer.min.js"></script>
+  <script src="../materialize/js/materialize.js"></script>
+
+  <script>
+
+    // Caculates the the radom numbers using middle square algorithm
+    function blumBlumShub(x, g, n){
+      let collection = [];         // Output collection
+      let m = Math.pow(2, g);
+      for(let i = 0; i < n; i++){
+        x = Math.pow(x, 2) % m; // function to calculate next x.
+        let r_i = x / (m - 1);
+        collection.push(Number(r_i)); // done.
+      }
+      return collection;
+    }
+
+    const {ipcRenderer} = require("electron");
+    let seedField = document.getElementById("txtSeed");
+    let gField = document.getElementById("txt_g");
+    let nField = document.getElementById("txtSize");
+
+    // Calculate on click.
+    document.getElementById("btnOk").onclick = (e) => {
+      e.preventDefault();
+      let seed = document.getElementById("txtSeed").value;
+      let g = document.getElementById("txt_g").value;
+      let n = document.getElementById("txtSize").value;
+      if(validate()){
+        ipcRenderer.send("ShowView:ViewCollection", blumBlumShub(seed, g, n));
+      }
+    };
+
+    // Whenever clicked remove the invalid class.
+    seedField.onfocus = () => {
+      seedField.classList.remove("invalid");
+    };
+
+    gField.onfocus = () => {
+      gField.classList.remove("invalid");
+    };
+
+    nField.onfocus = () => {
+      nField.classList.remove("invalid");
+    };
+
+    function validate(){
+      if(seedField.value == ""){ // Empty Input
+        Materialize.toast("Campo Vacio", 4000);
+        seedField.classList.add("invalid"); // Adds the invalid class to the corresponding field.
+        return false;
+      }else if(gField.value == ""){ // Empty Input
+        Materialize.toast("Campo Vacio", 4000);
+        gField.classList.add("invalid"); // Adds the invalid class to the corresponding field.
+        return false;
+      }else if(nField.value == ""){ // Empty Input
+        Materialize.toast("Campo Vacio", 4000);
+        nField.classList.add("invalid");
+        return false;
+      }else if((seedField.value + "").length < 3){ // Seed Size
+        Materialize.toast("Se requiere una semilla de minimo 3 digitos", 4000);
+        seedField.classList.add("invalid");
+        return false;
+      }else if(gField.value < 1){ // g value grater than 0
+        Materialize.toast("Se requiere un valor para g mayor a 0", 4000);
+        gField.classList.add("invalid");
+        return false;
+      }else if(seedField.value <= 0){ // Seed value
+        Materialize.toast("Se requiere una semilla con valor positivo diferente de 0", 4000);
+        seedField.classList.add("invalid");
+        return false;
+      }else if(gField.value <= 0){ // Seed value
+        Materialize.toast("Se requiere una semilla con valor positivo diferente de 0", 4000);
+        gField.classList.add("invalid");
+        return false;
+      } 
+      return true; // Everything is fine.
+    }
+
+  </script>
+
+</body>
+</html>
