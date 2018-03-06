@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="../materialize/css/materialize.min.css">
+  <title>Cuadrados Medios</title>
+</head>
+<body>
+  <form class="container">
+    <div class="input-field">
+      <input type="number" name="seed" id="txtSeed1" class="validate">
+      <label class="active" for="seed">Semilla 1</label>
+    </div>
+    <div class="input-field">
+      <input type="number" name="seed" id="txtSeed2" class="validate">
+      <label class="active" for="seed">Semilla 2</label>
+    </div>
+    <div class="input-field">
+      <input type="number" name="size" id="txtSize" class="validate">
+      <label class="active" for="size">Cantidad de Numeros</label>
+    </div>
+    <button id="btnOk" class="waves-effect waves-light btn col 4">
+      Ok
+    </button>
+  </form>
+
+  <script src="../node_modules/jquery/dist/jquery.js"></script>
+  <script src="../materialize/js/hammer.min.js"></script>
+  <script src="../materialize/js/materialize.js"></script>
+
+  <script>
+
+    // Caculates the the radom numbers using middle square algorithm
+    function midProd(x1, x2, n){
+      let D = (x1 + "").length; // This is the size of each X
+      let collection = [];         // Output collection
+      for(let i = 0; i < n; i++){
+        let prod = x1 * x2; // Multiply x1 by x2
+        x1 = x2; // move x2
+        x2 = extractFromMiddle(prod, D); // extract D numbers from the middle.
+        let r_i = "0." + x2;  // append a 0 to the beggining
+        collection.push(Number(r_i)); // done.
+      }
+      return collection;
+    }
+
+    function extractFromMiddle(num, n){
+      num = String(num);
+      if(num.lenght % 2 != n % 2){ // One is pair the oher odd.
+        num = "0" + num; // Insert a 0 to the left.
+      }
+      let index = (num.length - n) / 2
+      return Number(String(num).substr(index + 1,n)); //Returns the extracted digits as a number.
+    }
+
+    const {ipcRenderer} = require("electron");
+    let seed1Field = document.getElementById("txtSeed1");
+    let seed2Field = document.getElementById("txtSeed2");
+    let nField = document.getElementById("txtSize");
+
+    // Calculate on click.
+    document.getElementById("btnOk").onclick = (e) => {
+      e.preventDefault();
+      let seed1 = seed1Field.value;
+      let seed2 = seed2Field.value;
+      let n = nField.value;
+      if(validate()){
+        ipcRenderer.send("ShowView:ViewCollection", midProd(seed1, seed2, n));
+      }
+    };
+
+    // Whenever clicked remove the invalid class.
+    seed1Field.onfocus = () => {
+      seed1Field.classList.remove("invalid");
+    };
+
+    seed2Field.onfocus = () => {
+      seed2Field.classList.remove("invalid");
+    };
+
+    nField.onfocus = () => {
+      nField.classList.remove("invalid");
+    };
+
+    function validate(){
+      if(seed1Field.value == ""){ // Empty Input
+        Materialize.toast("Campo Vacio", 4000);
+        seed1Field.classList.add("invalid"); // Adds the invalid class to the corresponding field.
+        return false;
+      }else if(seed2Field.value == ""){ // Empty Input
+        Materialize.toast("Campo Vacio", 4000);
+        seed2Field.classList.add("invalid"); // Adds the invalid class to the corresponding field.
+        return false;
+      }else if(nField.value == ""){ // Empty Input
+        Materialize.toast("Campo Vacio", 4000);
+        nField.classList.add("invalid");
+        return false;
+      }else if((seed1Field.value + "").length < 3){ // Seed Size
+        Materialize.toast("Se requiere una semilla de minimo 3 digitos", 4000);
+        seed1Field.classList.add("invalid");
+        return false;
+      }else if((seed2Field.value + "").length < 3){ // Seed Size
+        Materialize.toast("Se requiere una semilla de minimo 3 digitos", 4000);
+        seed2Field.classList.add("invalid");
+        return false;
+      }else if(nField.value < 1){// Require a positive grater than 1 quantity of generated numbers.
+        Materialize.toast("La cantidad de numeros a generar debe ser minimo 1.", 4000);
+        nField.classList.add("invalid");
+        return false;
+      }else if(seed1Field.value <= 0){ // Seed value
+        Materialize.toast("Se requiere una semilla con valor positivo diferente de 0", 4000);
+        seed1Field.classList.add("invalid");
+        return false;
+      }else if(seed2Field.value <= 0){ // Seed value
+        Materialize.toast("Se requiere una semilla con valor positivo diferente de 0", 4000);
+        seed2Field.classList.add("invalid");
+        return false;
+      }else if((seed1Field.value + "").length != (seed2Field.value + "").length){  // Different sizes.
+        Materialize.toast("La cantidad de digitos de las semillas debe ser igual.", 4000);
+        seed1Field.classList.add("invalid");
+        seed2Field.classList.add("invalid");
+        return false;
+      } 
+      return true; // Everything is fine.
+    }
+
+  </script>
+
+</body>
+</html>
