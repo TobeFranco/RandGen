@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="../materialize/css/materialize.min.css">
+  <title>Congruencial multiplicativo</title>
+</head>
+<body>
+  <form class="container">
+    <div class="input-field">
+      <input type="number" name="seed" id="txtSeed" class="validate">
+      <label class="active" for="seed">Semilla</label>
+    </div>
+    <div class="input-field">
+      <input type="number" name="multiplierA" id="txtMultiplierA" class="validate">
+      <label class="active" for="multiplierA">Multiplicador A</label>
+    </div>
+    <div class="input-field">
+      <input type="number" name="multiplierB" id="txtMultiplierB" class="validate">
+      <label class="active" for="multiplierB">Multiplicador B</label>
+    </div>
+    <div class="input-field">
+      <input type="number" name="constant" id="txtConstant" class="validate">
+      <label class="active" for="constant">Constante</label>
+    </div>
+    <div class="input-field">
+      <input type="number" name="power" id="txtPower" class="validate">
+      <label class="active" for="power">Potencia para el módulo</label>
+    </div>
+    <div class="input-field">
+      <input type="number" name="size" id="txtSize" class="validate">
+      <label class="active" for="size">Cantidad de Numeros</label>
+    </div>
+    <button id="btnOk" class="waves-effect waves-light btn col 4">
+      Ok
+    </button>
+  </form>
+
+  <script>
+
+    function conCuad(seed, mA, mB, constant, power, n){
+      let x = parseInt(seed);
+      let collection = [];
+      let module  = 1;
+      for(let i = 0; i<power; i++){
+        module = module * 2;
+      }
+      for(let i = 0; i<n; i++){
+        x = (parseInt(mA) * x * x + parseInt(mB) * x + parseInt(constant)) % parseInt(module);
+        r = x / (module - 1);
+        collection.push(r); 
+      }
+      return collection;
+    }
+
+    const {ipcRenderer} = require("electron");
+
+     // Calculate
+    document.getElementById("btnOk").onclick = (e) => {
+      e.preventDefault();
+      let seed = parseInt(document.getElementById("txtSeed").value);
+      let multiplierA = parseInt(document.getElementById("txtMultiplierA").value);
+      let multiplierB = parseInt(document.getElementById("txtMultiplierB").value);
+      let constant = parseInt(document.getElementById("txtConstant").value);
+      let power = parseInt(document.getElementById("txtPower").value);
+      let n = parseInt(document.getElementById("txtSize").value);
+      ipcRenderer.send("ShowView:ViewCollection", conCuad(seed, multiplierA, multiplierB, constant, power, n));
+    };
+  </script>
+
+</body>
+</html>

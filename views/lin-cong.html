@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="../materialize/css/materialize.min.css">
+  <title>Congruencial lineal</title>
+</head>
+<body>
+  <form class="container">
+    <div class="input-field">
+      <input type="number" name="seed" id="txtSeed" class="validate">
+      <label class="active" for="seed">Semilla</label>
+    </div>
+    <div class="input-field">
+      <input type="number" name="multiplier" id="txtMultiplier" class="validate">
+      <label class="active" for="multiplier">Multiplicador</label>
+    </div>
+    <div class="input-field">
+      <input type="number" name="con" id="txtCon" class="validate">
+      <label class="active" for="con">Constante</label>
+    </div>
+    <div class="input-field">
+      <input type="number" name="module" id="txtModule" class="validate">
+      <label class="active" for="module">Módulo</label>
+    </div>
+    <div class="input-field">
+      <input type="number" name="size" id="txtSize" class="validate">
+      <label class="active" for="size">Cantidad de Numeros</label>
+    </div>
+    <button id="btnOk" class="waves-effect waves-light btn col 4">
+      Ok
+    </button>
+  </form>
+
+  <script>
+
+    function conLin(seed, con, multiplier, n, module){
+      let x = parseInt(seed);
+      let collection = [];
+      let last = seed;
+      for(let i = 0; i<n; i++){
+        x = (parseInt(multiplier) * parseInt(last) + parseInt(con)) % parseInt(module);
+        let r = x / (parseInt(module)-1);
+        collection.push(r);
+        last = x;
+      }
+      return collection;
+    }
+
+    const {ipcRenderer} = require("electron");
+
+     // Calculate
+    document.getElementById("btnOk").onclick = (e) => {
+      e.preventDefault();
+      let seed = parseInt(document.getElementById("txtSeed").value);
+      let n = parseInt(document.getElementById("txtSize").value);
+      let con = parseInt(document.getElementById("txtCon").value);
+      let multiplier = parseInt(document.getElementById("txtMultiplier").value);
+      let module = parseInt(document.getElementById("txtModule").value);
+      ipcRenderer.send("ShowView:ViewCollection", conLin(seed, con, multiplier, n, module));
+    };
+  </script>
+
+</body>
+</html>

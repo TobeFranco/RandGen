@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="../materialize/css/materialize.min.css">
+  <title>Congruencial aditivo</title>
+</head>
+<body>
+  <form class="container">
+    <div class="input-field">
+      <input type="number" name="seed" id="txtSeed" class="validate">
+      <label class="active" for="seed">Semilla nueva</label>
+    </div>
+    <button id="btnAgregar" class="waves-effect waves-light btn col 4">
+      Agregar
+    </button>
+    <div class="input-field">
+      <input type="number" name="module" id="txtModule" class="validate">
+      <label class="active" for="module">Módulo</label>
+    </div>
+    <div class="input-field">
+      <input type="number" name="size" id="txtSize" class="validate">
+      <label class="active" for="size">Cantidad de números</label>
+    </div>
+    <button id="btnOk" class="waves-effect waves-light btn col 4">
+      Ok
+    </button>
+  </form>
+
+  <script>
+    let n = 0;
+    let numbers = []; 
+
+    function addSeed(seed){
+      numbers.push(seed);
+      n++;
+      document.getElementById("txtSeed").value = "";
+    }
+
+    function conAdd(module, size){
+      let collection = [];
+      for(let i = 0; i<size; i++){
+        let actual = (parseInt(numbers[i]) + parseInt(numbers[i+n-1])) % parseInt(module);
+        let r = actual / (parseInt(module) -1);
+        numbers.push(actual);
+        collection.push(r);
+      }
+      return collection;
+    }
+
+    const {ipcRenderer} = require("electron");
+
+     // Calculate
+    document.getElementById("btnOk").onclick = (e) => {
+      e.preventDefault();
+      let module = parseInt(document.getElementById("txtModule").value);
+      let size = parseInt(document.getElementById("txtSize").value);
+      ipcRenderer.send("ShowView:ViewCollection", conAdd(module,size));
+    };
+
+    document.getElementById("btnAgregar").onclick = (e) => {
+      e.preventDefault();
+      let seed = parseInt(document.getElementById("txtSeed").value);
+      addSeed(seed);
+    };
+  </script>
+
+</body>
+</html>
